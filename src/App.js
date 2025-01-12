@@ -1,10 +1,10 @@
-import "./App.css";
 import { useState } from "react";
+import "./App.css";
 
 function Square({ value, onSquareClick }) {
   return (
     <button
-      className="w-16 h-16 bg-gray-600 text-2xl font-bold text-white rounded hover:bg-gray-500 transition duration-300"
+      className="w-16 h-16 bg-gray-600 text-2xl font-bold text-white rounded hover:bg-gray-500 transition duration-300 sm:w-20 sm:h-20"
       onClick={onSquareClick}
     >
       {value}
@@ -26,17 +26,8 @@ function Board({ xIsNext, squares, onPlay }) {
     onPlay(nextSquares);
   }
 
-  const winner = calculateWinner(squares);
-  let status;
-  if (winner) {
-    status = "Winner: " + winner;
-  } else {
-    status = "Next player: " + (xIsNext ? "X" : "O");
-  }
-
   return (
     <div>
-      <div className="text-xl font-bold text-gray-200 mb-4">{status}</div>
       <div className="board flex flex-col gap-4">
         <div className="board-row flex gap-4">
           <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
@@ -61,45 +52,97 @@ function Board({ xIsNext, squares, onPlay }) {
 export default function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
+  const [showWinnerScreen, setShowWinnerScreen] = useState(false);
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
+  const winner = calculateWinner(currentSquares);
 
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
+
+    if (calculateWinner(nextSquares)) {
+      setShowWinnerScreen(true);
+    }
   }
 
   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
   }
 
-  const moves = history.map((squares, move) => {
-    let description;
-    if (move > 0) {
-      description = "Go to move #" + move;
-    } else {
-      description = "Go to game start";
-    }
+  function resetGame() {
+    setHistory([Array(9).fill(null)]);
+    setCurrentMove(0);
+    setShowWinnerScreen(false);
+  }
+
+  const moves = history
+    .map((squares, move) => {
+      if (move === 0) return null;
+      return (
+        <li key={move}>
+          <button
+            onClick={() => jumpTo(move)}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200 mt-2"
+          >
+            {`Go to move #${move}`}
+          </button>
+        </li>
+      );
+    })
+    .filter(Boolean);
+
+  if (!showWinnerScreen) {
     return (
-      <li key={move}>
-        <button
-          onClick={() => jumpTo(move)}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200 mt-2"
-        >
-          {description}
-        </button>
-      </li>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-white px-4 sm:px-6">
+        <div className="game-board p-4 bg-gray-900 rounded-lg shadow-lg sm:w-96">
+          <Board
+            xIsNext={xIsNext}
+            squares={currentSquares}
+            onPlay={handlePlay}
+          />
+        </div>
+
+        {currentMove > 0 && (
+          <div className="game-info mt-4 p-4 bg-gray-700 rounded-lg shadow-md w-full max-w-xs sm:max-w-sm">
+            <ol className="list-none ml-4 flex flex-col items-center">
+              {moves}
+            </ol>
+            {winner && (
+              <div className="mt-4 flex justify-center">
+                <button
+                  onClick={resetGame}
+                  className="bg-green-500 px-6 py-2 rounded font-semibold text-white hover:bg-green-600 transition"
+                >
+                  Replay
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     );
-  });
+  }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-white">
-      <div className="game-board p-4 bg-gray-900 rounded-lg shadow-lg">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
-      </div>
-      <div className="game-info mt-4 p-4 bg-gray-700 rounded-lg shadow-md">
-        <ol className="list-none ml-4">{moves}</ol>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-white px-4 sm:px-6">
+      <h1 className="text-4xl font-bold mb-6 text-center sm:text-5xl">
+        Winner is: <span className="text-yellow-400">{winner}</span>
+      </h1>
+      <div className="flex gap-4 mb-4 flex-col sm:flex-row">
+        <button
+          onClick={resetGame}
+          className="bg-green-500 px-6 py-2 rounded font-semibold text-white hover:bg-green-600 transition mb-2 sm:mb-0"
+        >
+          Replay
+        </button>
+        <button
+          onClick={() => setShowWinnerScreen(false)}
+          className="bg-blue-500 px-6 py-2 rounded font-semibold text-white hover:bg-blue-600 transition"
+        >
+          Back to Moves
+        </button>
       </div>
     </div>
   );
