@@ -4,7 +4,7 @@ import "./App.css";
 function Square({ value, onSquareClick }) {
   return (
     <button
-      className="w-16 h-16 bg-gray-600 text-2xl font-bold text-white rounded hover:bg-gray-500 transition duration-300 sm:w-20 sm:h-20"
+      className="w-16 h-16 bg-gray-600 text-2xl font-bold text-white rounded hover:bg-gray-500 transition duration-300"
       onClick={onSquareClick}
     >
       {value}
@@ -95,8 +95,8 @@ export default function Game() {
 
   if (!showWinnerScreen) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-white px-4 sm:px-6">
-        <div className="game-board p-4 bg-gray-900 rounded-lg shadow-lg sm:w-96">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-white">
+        <div className="game-board p-4 bg-gray-900 rounded-lg shadow-lg">
           <Board
             xIsNext={xIsNext}
             squares={currentSquares}
@@ -105,10 +105,9 @@ export default function Game() {
         </div>
 
         {currentMove > 0 && (
-          <div className="game-info mt-4 p-4 bg-gray-700 rounded-lg shadow-md w-full max-w-xs sm:max-w-sm">
-            <ol className="list-none ml-4 flex flex-col items-center">
-              {moves}
-            </ol>
+          <div className="game-info mt-4 mb-4 p-4 bg-gray-700 rounded-lg shadow-md w-full max-w-xs">
+            <ol className="list-none flex flex-col items-center">{moves}</ol>
+
             {winner && (
               <div className="mt-4 flex justify-center">
                 <button
@@ -126,14 +125,14 @@ export default function Game() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-white px-4 sm:px-6">
-      <h1 className="text-4xl font-bold mb-6 text-center sm:text-5xl">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-white">
+      <h1 className="text-4xl font-bold mb-6">
         Winner is: <span className="text-yellow-400">{winner}</span>
       </h1>
-      <div className="flex gap-4 mb-4 flex-col sm:flex-row">
+      <div className="flex gap-4 mb-4">
         <button
           onClick={resetGame}
-          className="bg-green-500 px-6 py-2 rounded font-semibold text-white hover:bg-green-600 transition mb-2 sm:mb-0"
+          className="bg-green-500 px-6 py-2 rounded font-semibold text-white hover:bg-green-600 transition"
         >
           Replay
         </button>
