@@ -56,13 +56,17 @@ export default function Game() {
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
   const winner = calculateWinner(currentSquares);
+  const isTied = !winner && currentSquares.every((square) => square !== null);
 
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
 
-    if (calculateWinner(nextSquares)) {
+    if (
+      calculateWinner(nextSquares) ||
+      nextSquares.every((square) => square !== null)
+    ) {
       setShowWinnerScreen(true);
     }
   }
@@ -107,17 +111,14 @@ export default function Game() {
         {currentMove > 0 && (
           <div className="game-info mt-4 mb-4 p-4 bg-gray-700 rounded-lg shadow-md w-full max-w-xs">
             <ol className="list-none flex flex-col items-center">{moves}</ol>
-
-            {winner && (
-              <div className="mt-4 flex justify-center">
-                <button
-                  onClick={resetGame}
-                  className="bg-green-500 px-6 py-2 rounded font-semibold text-white hover:bg-green-600 transition"
-                >
-                  Replay
-                </button>
-              </div>
-            )}
+            <div className="mt-4 flex justify-center">
+              <button
+                onClick={resetGame}
+                className="bg-green-500 px-6 py-2 rounded font-semibold text-white hover:bg-green-600 transition"
+              >
+                Replay
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -127,7 +128,13 @@ export default function Game() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-white">
       <h1 className="text-4xl font-bold mb-6">
-        Winner is: <span className="text-yellow-400">{winner}</span>
+        {winner ? (
+          <>
+            Winner is: <span className="text-yellow-400">{winner}</span>
+          </>
+        ) : (
+          "Tied"
+        )}
       </h1>
       <div className="flex gap-4 mb-4">
         <button
